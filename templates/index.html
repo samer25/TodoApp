@@ -1,0 +1,60 @@
+{% load crispy_forms_filters %}
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="{% static "todo/css/main.css" %}">
+</head>
+<body>
+<div class="box">
+    <h1>My Todo List</h1>
+    {% if pk %}
+        <form method="post" action="{% url form_action pk %}">
+    {% else %}
+        <form method="post" action="{% url form_action %}">
+
+    {% endif %}
+    {% csrf_token %}
+    <label>
+        {{ todo_form.name.label_tag }}
+        {{ todo_form.name }}
+        {{ todo_form.name.errors }}
+
+    </label>
+    <label>
+        {{ todo_form.description.label_tag }}
+        {#                {{ todo_form.description }}#}
+        <textarea name="{{ todo_form.description.html_name }}"
+                  id="{{ todo_form.description.id_for_label }}">{{ todo_form.description.value }}</textarea>
+        {{ todo_form.description.errors }}
+    </label>
+    {{ todo_form.bot_catcher }}
+    <button>Create</button>
+
+    </form>
+
+    {% for do in todo %}
+        <div class="content">
+            <h2>{{ do.name }}</h2>
+            <p> {{ do.description }}</p>
+            {% if do.is_done %}
+                <h3 class="is-done">Done</h3>
+            {% else %}
+                <h3 class="not-done">Not Done</h3>
+            {% endif %}
+            <form method="post" action="{% url 'mark todo done' do.id %}">
+                {% csrf_token %}
+                <button>Change state</button>
+            </form>
+        </div>
+        <a href="{% url "edit todo" do.id %}">Edit</a>
+        <a href="{% url 'delete todo' do.id %}">Delete</a>
+    {% endfor %}
+
+</div>
+
+</body>
+</html>
